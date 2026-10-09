@@ -24,29 +24,28 @@ async function bootstrap() {
 
   const isProd = process.env.NODE_ENV === 'production';
 
-  if (!isProd) {
-    const swaggerConfig = new DocumentBuilder()
-      .setTitle('API de gestión y auditoría')
-      .setDescription(
-        'API para autenticación, usuarios, roles y consulta de registros de auditoría.',
-      )
-      .setVersion('1.0')
-      .addBearerAuth(
-        {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          description: 'Token de acceso de Supabase',
-        },
-        'supabase-jwt',
-      )
-      .build();
-    const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup('api/docs', app, swaggerDocument, {
-      jsonDocumentUrl: 'api/docs/openapi.json',
-      customSiteTitle: 'Documentación de la API de gestión y auditoría',
-    });
-  }
+  
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('API de gestión y auditoría')
+    .setDescription(
+      'API para autenticación, usuarios, roles, consulta de registros de auditoría.',
+    )
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Token de acceso de Supabase',
+      },
+      'supabase-jwt',
+    )
+    .build();
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, swaggerDocument, {
+    jsonDocumentUrl: 'api/docs/openapi.json',
+    customSiteTitle: 'Documentación de la API de gestión y auditoría',
+  });
 
   const port = Number(process.env.PORT ?? 3000);
   await app.listen(port, '0.0.0.0');
