@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Headers,
   Post,
 } from '@nestjs/common';
 import {
@@ -43,5 +44,18 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Credenciales inválidas.' })
   iniciarSesion(@Body() datos: LoginDto) {
     return this.authService.iniciarSesion(datos.email, datos.password);
+  }
+
+  @Post('logout')
+  @ApiOperation({
+    summary: 'Cierra la sesión del usuario autenticado',
+    description:
+      'Revoca la sesión y el refresh token en Supabase. El cliente debe eliminar también el access_token almacenado.',
+  })
+  @ApiResponse({ status: 200, description: 'Sesión cerrada correctamente.' })
+  @ApiResponse({ status: 401, description: 'Token ausente o inválido.' })
+  cerrarSesion(@Headers('authorization') autorizacion: string) {
+    const token = autorizacion.trim().split(/\s+/)[1];
+    return this.authService.cerrarSesion(token);
   }
 }

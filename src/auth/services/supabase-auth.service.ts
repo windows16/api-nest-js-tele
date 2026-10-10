@@ -47,4 +47,19 @@ export class SupabaseAuthService {
 
     return datos.user;
   }
+
+  async cerrarSesion(tokenAcceso: string): Promise<{ mensaje: string }> {
+    const { error } = await this.supabaseService.cliente.auth.admin.signOut(
+      tokenAcceso,
+      'global',
+    );
+
+    if (error) {
+      throw new InternalServerErrorException(
+        'No se pudo cerrar la sesión en Supabase',
+      );
+    }
+
+    return { mensaje: 'Sesión cerrada correctamente' };
+  }
 }
