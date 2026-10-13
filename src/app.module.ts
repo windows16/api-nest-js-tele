@@ -6,6 +6,7 @@ import { AuditModule } from './audit/audit.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { UsersModule } from './users/users.module.js';
 import { ClientesModule } from './clientes/clientes.module.js';
+import { ProductosModule } from './productos/productos.module.js';
 
 
 @Module({
@@ -19,6 +20,7 @@ import { ClientesModule } from './clientes/clientes.module.js';
     UsersModule,
     AuditModule,
     ClientesModule,
+    ProductosModule,
   ],
   controllers: [AppController],
 })
