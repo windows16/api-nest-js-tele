@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module.js';
 import { UsersModule } from './users/users.module.js';
 import { ClientesModule } from './clientes/clientes.module.js';
 import { ProductosModule } from './productos/productos.module.js';
+import { VentasModule } from './ventas/ventas.module.js';
 
 
 @Module({
@@ -21,6 +22,7 @@ import { ProductosModule } from './productos/productos.module.js';
     AuditModule,
     ClientesModule,
     ProductosModule,
+    VentasModule,
   ],
   controllers: [AppController],
 })
