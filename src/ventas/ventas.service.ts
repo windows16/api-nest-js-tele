@@ -26,6 +26,57 @@ type VentaRpcResult = {
 export class VentasService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
+  async listar(
+    clienteId?: string,
+    fechaDesde?: string,
+    fechaHasta?: string,
+  ) {
+    let consulta = this.supabaseService.cliente
+      .from('ventas')
+      .select(
+        `
+        id,
+        fecha,
+        cliente_id,
+        cliente:clientes (
+          id,
+          nombre,
+          correo
+        ),
+        detalles:detalle_venta (
+          cantidad,
+          precio
+        )
+      `,
+      )
+      .order('fecha', { ascending: false });
+
+    if (clienteId) consulta = consulta.eq('cliente_id', clienteId);
+    if (fechaDesde) consulta = consulta.gte('fecha', `${fechaDesde}T00:00:00.000Z`);
+    if (fechaHasta) consulta = consulta.lt('fecha', `${fechaHasta}T23:59:59.999Z`);
+
+    const { data, error } = await consulta;
+    if (error) {
+      throw new InternalServerErrorException('No se pudieron consultar las ventas');
+    }
+
+    return data.map((venta) => ({
+      id: venta.id,
+      fecha: venta.fecha,
+      cliente_id: venta.cliente_id,
+      cliente: venta.cliente,
+      total: Number(
+        (venta.detalles ?? [])
+          .reduce(
+            (total, detalle) =>
+              total + Number(detalle.precio) * detalle.cantidad,
+            0,
+          )
+          .toFixed(2),
+      ),
+    }));
+  }
+
   async crearVenta(datos: CrearVentaBaseDto) {
     const { data, error } = await this.supabaseService.cliente
       .from('ventas')

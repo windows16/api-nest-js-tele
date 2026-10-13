@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateVentaDto } from './dto/create-venta.dto.js';
 import { AgregarProductoVentaDto } from './dto/agregar-producto-venta.dto.js';
@@ -10,6 +18,16 @@ import { VentasService } from './ventas.service.js';
 @Controller('v1/ventas')
 export class VentasController {
   constructor(private readonly ventasService: VentasService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Lista los encabezados de las ventas' })
+  listar(
+    @Query('clienteId') clienteId?: string,
+    @Query('fechaDesde') fechaDesde?: string,
+    @Query('fechaHasta') fechaHasta?: string,
+  ) {
+    return this.ventasService.listar(clienteId, fechaDesde, fechaHasta);
+  }
 
   @Post('base')
   @ApiOperation({ summary: 'Crea una venta sin productos' })
