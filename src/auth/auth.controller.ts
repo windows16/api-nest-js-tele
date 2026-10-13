@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   Post,
 } from '@nestjs/common';
@@ -11,8 +12,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from './decorators/public.decorator.js';
+import { CurrentUser } from './decorators/current-user.decorator.js';
 import { LoginDto } from './dto/login.dto.js';
 import { SupabaseAuthService } from './services/supabase-auth.service.js';
+import type { User } from '@supabase/supabase-js';
 
 @ApiTags('Autenticación')
 @Controller('v1/auth')
@@ -44,6 +47,12 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Credenciales inválidas.' })
   iniciarSesion(@Body() datos: LoginDto) {
     return this.authService.iniciarSesion(datos.email, datos.password);
+  }
+
+  @Get('me')
+  @ApiOperation({ summary: 'Obtiene el usuario autenticado' })
+  obtenerUsuario(@CurrentUser() usuario: User) {
+    return usuario;
   }
 
   @Post('logout')
