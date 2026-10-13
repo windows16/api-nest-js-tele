@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module.js';
 import { AuditModule } from './audit/audit.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { UsersModule } from './users/users.module.js';
+import { ClientesModule } from './clientes/clientes.module.js';
+
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { UsersModule } from './users/users.module.js';
     AuthModule,
     UsersModule,
     AuditModule,
+    ClientesModule,
   ],
   controllers: [AppController],
 })
