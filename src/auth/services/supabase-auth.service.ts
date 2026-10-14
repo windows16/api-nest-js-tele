@@ -11,8 +11,9 @@ export class SupabaseAuthService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   async iniciarSesion(email: string, password: string) {
+    const clienteAuth = this.supabaseService.crearClienteAuth();
     const { data, error } =
-      await this.supabaseService.cliente.auth.signInWithPassword({
+      await clienteAuth.auth.signInWithPassword({
         email,
         password,
       });
@@ -36,8 +37,9 @@ export class SupabaseAuthService {
   }
 
   async refrescarSesion(refreshToken: string) {
+    const clienteAuth = this.supabaseService.crearClienteAuth();
     const { data, error } =
-      await this.supabaseService.cliente.auth.refreshSession({
+      await clienteAuth.auth.refreshSession({
         refresh_token: refreshToken,
       });
 
