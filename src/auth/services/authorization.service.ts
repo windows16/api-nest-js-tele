@@ -38,9 +38,7 @@ export class AuthorizationService {
       .limit(1);
 
     if (errorSupabase) {
-      throw new InternalServerErrorException(
-        'No se pudieron verificar los permisos',
-      );
+      throw new InternalServerErrorException(errorSupabase.message);
     }
 
     return datos.length > 0;
@@ -58,9 +56,7 @@ export class AuthorizationService {
       .eq('organizacion_id', organizacionId);
 
     if (errorMembresia) {
-      throw new InternalServerErrorException(
-        'No se pudieron consultar los permisos del usuario',
-      );
+      throw new InternalServerErrorException(errorMembresia.message);
     }
 
     const idsRol = datosMembresia.map((registro) => registro.rol_id);
@@ -75,9 +71,7 @@ export class AuthorizationService {
         .in('rol_id', idsRol);
 
     if (errorRolPermiso) {
-      throw new InternalServerErrorException(
-        'No se pudieron consultar las relaciones de permisos',
-      );
+      throw new InternalServerErrorException(errorRolPermiso.message);
     }
 
     const idsPermiso = datosRolPermiso.map((registro) => registro.permiso_id);
@@ -91,9 +85,7 @@ export class AuthorizationService {
       .in('id', idsPermiso);
 
     if (errorPermiso) {
-      throw new InternalServerErrorException(
-        'No se pudieron consultar los permisos',
-      );
+      throw new InternalServerErrorException(errorPermiso.message);
     }
 
     const nombresPermiso = new Set(
@@ -110,9 +102,7 @@ export class AuthorizationService {
       .limit(2);
 
     if (error) {
-      throw new InternalServerErrorException(
-        'No se pudo obtener la organización del usuario',
-      );
+      throw new InternalServerErrorException(error.message);
     }
 
     const organizaciones = [
@@ -163,9 +153,7 @@ export class AuthorizationService {
         { onConflict: 'organizacion_id,usuario_id' },
       );
 
-    if (errorActualizacion) {
-      throw new InternalServerErrorException('No se pudo asignar el rol');
-    }
+    if (errorActualizacion) {errorActualizacion.message}
 
     await this.auditService.registrar({
       usuarioId: usuarioActorId,
@@ -197,7 +185,7 @@ export class AuthorizationService {
       if (error.code === '23505') {
         throw new ConflictException('Ya existe un rol con ese nombre');
       }
-      throw new InternalServerErrorException('No se pudo crear el rol');
+      throw new InternalServerErrorException(error.message);
     }
 
     await this.auditService.registrar({
@@ -221,7 +209,7 @@ export class AuthorizationService {
       .order('nombre', { ascending: true });
 
     if (error) {
-      throw new InternalServerErrorException('No se pudieron obtener los roles');
+      throw new InternalServerErrorException(error.message);
     }
 
     return data;
@@ -242,7 +230,7 @@ export class AuthorizationService {
       .maybeSingle();
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo actualizar el rol');
+      throw new InternalServerErrorException(error.message);
     }
     if (!data) {
       throw new NotFoundException('Rol no encontrado');
@@ -274,7 +262,7 @@ export class AuthorizationService {
       .maybeSingle();
 
     if (errorRol) {
-      throw new InternalServerErrorException('No se pudo consultar el rol');
+      throw new InternalServerErrorException(errorRol.message);
     }
     if (!rol) {
       throw new NotFoundException('Rol no encontrado');
@@ -289,9 +277,7 @@ export class AuthorizationService {
       .eq('rol_id', rolId);
 
     if (errorMembresias) {
-      throw new InternalServerErrorException(
-        'No se pudo comprobar el uso del rol',
-      );
+      throw new InternalServerErrorException();
     }
     if ((count ?? 0) > 0) {
       throw new ConflictException(
@@ -305,7 +291,7 @@ export class AuthorizationService {
       .eq('id', rolId);
 
     if (error) {
-      throw new InternalServerErrorException('No se pudo eliminar el rol');
+      throw new InternalServerErrorException(error.message);
     }
 
     await this.auditService.registrar({
@@ -338,9 +324,7 @@ export class AuthorizationService {
       );
 
       if (error) {
-        throw new InternalServerErrorException(
-          'No se pudo asignar el permiso al rol',
-        );
+        throw new InternalServerErrorException(error.message);
       }
 
       await this.auditService.registrar({
@@ -370,9 +354,7 @@ export class AuthorizationService {
         .eq('permiso_id', permisoId);
 
       if (error) {
-        throw new InternalServerErrorException(
-          'No se pudo retirar el permiso del rol',
-        );
+        throw new InternalServerErrorException(error.message);
       }
 
       await this.auditService.registrar({

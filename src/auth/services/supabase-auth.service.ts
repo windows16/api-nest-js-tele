@@ -22,9 +22,7 @@ export class SupabaseAuthService {
     }
 
     if (error || !data.session) {
-      throw new InternalServerErrorException(
-        'No se pudo iniciar la sesión en Supabase',
-      );
+      throw new InternalServerErrorException(error?.message);
     }
 
     return {
@@ -79,9 +77,7 @@ export class SupabaseAuthService {
 
     if (error) {
       // Si el token ya expiro, Supabase puede devolver error; no es critico para el cliente.
-      throw new InternalServerErrorException(
-        'No se pudo cerrar la sesion en Supabase',
-      );
+      throw new InternalServerErrorException(error.message);
     }
 
     return { mensaje: 'Sesion cerrada correctamente' };

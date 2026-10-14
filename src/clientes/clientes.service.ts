@@ -18,7 +18,7 @@ export class ClientesService {
       .insert(datos)
       .select()
       .single();
-    this.comprobarError(error, 'No se pudo crear el cliente');
+    this.comprobarError(error, error?.message || "error al crear cliente");
     return data;
   }
 
@@ -27,7 +27,7 @@ export class ClientesService {
       .from('clientes')
       .select('*')
       .order('nombre');
-    if (error) throw new InternalServerErrorException('No se pudieron consultar los clientes');
+    if (error) throw new InternalServerErrorException(error.message);
     return data;
   }
 
@@ -37,7 +37,7 @@ export class ClientesService {
       .select('*')
       .eq('id', id)
       .maybeSingle();
-    if (error) throw new InternalServerErrorException('No se pudo consultar el cliente');
+    if (error) throw new InternalServerErrorException(error.message);
     if (!data) throw new NotFoundException('Cliente no encontrado');
     return data;
   }
@@ -63,7 +63,7 @@ export class ClientesService {
     if (error?.code === '23503') {
       throw new ConflictException('No se puede eliminar un cliente con ventas');
     }
-    if (error) throw new InternalServerErrorException('No se pudo eliminar el cliente');
+    if (error) throw new InternalServerErrorException(error.message);
     return { mensaje: 'Cliente eliminado correctamente' };
   }
 

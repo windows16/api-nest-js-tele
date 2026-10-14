@@ -57,7 +57,7 @@ export class VentasService {
 
     const { data, error } = await consulta;
     if (error) {
-      throw new InternalServerErrorException('No se pudieron consultar las ventas');
+      throw new InternalServerErrorException(error.message);
     }
 
     return data.map((venta) => ({
@@ -88,7 +88,7 @@ export class VentasService {
       throw new NotFoundException('Cliente no encontrado');
     }
     if (error) {
-      throw new InternalServerErrorException('No se pudo crear la venta');
+      throw new InternalServerErrorException(error.message);
     }
     return { ...data, total: 0, detalles: [] };
   }
@@ -110,9 +110,7 @@ export class VentasService {
       throw new NotFoundException('Venta o producto no encontrado');
     }
     if (error) {
-      throw new InternalServerErrorException(
-        'No se pudo agregar el producto a la venta',
-      );
+      throw new InternalServerErrorException(error.message);
     }
     return data;
   }
@@ -146,9 +144,7 @@ export class VentasService {
       .maybeSingle();
 
     if (error) {
-      throw new InternalServerErrorException(
-        'No se pudo consultar la venta completa',
-      );
+      throw new InternalServerErrorException(error.message);
     }
     if (!data) {
       throw new NotFoundException('Venta no encontrada');
@@ -196,7 +192,7 @@ export class VentasService {
       throw new NotFoundException('Cliente o producto no encontrado');
     }
     if (error) {
-      throw new InternalServerErrorException('No se pudo crear la venta');
+      throw new InternalServerErrorException(error.message);
     }
 
     return data as VentaRpcResult;

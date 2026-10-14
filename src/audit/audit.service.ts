@@ -42,9 +42,7 @@ export class AuditService {
       });
 
     if (error) {
-      throw new InternalServerErrorException(
-        'No se pudo registrar la operación en auditoría',
-      );
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -77,9 +75,7 @@ export class AuditService {
       .limit(limite);
 
     if (error) {
-      throw new InternalServerErrorException(
-        'No se pudieron obtener los registros de auditoría',
-      );
+      throw new InternalServerErrorException(error.message);
     }
 
     return data as RegistroAuditoria[];

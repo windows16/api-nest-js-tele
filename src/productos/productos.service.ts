@@ -9,31 +9,31 @@ export class ProductosService {
 
   async crear(datos: CreateProductoDto) {
     const { data, error } = await this.supabaseService.cliente.from('productos').insert(datos).select().single();
-    if (error) throw new InternalServerErrorException('No se pudo crear el producto');
+    if (error) throw new InternalServerErrorException(error.message);
     return data;
   }
   async listar() {
     const { data, error } = await this.supabaseService.cliente.from('productos').select('*').order('nombre');
-    if (error) throw new InternalServerErrorException('No se pudieron consultar los productos');
+    if (error) throw new InternalServerErrorException(error.message);
     return data;
   }
   async obtener(id: string) {
     const { data, error } = await this.supabaseService.cliente.from('productos').select('*').eq('id', id).maybeSingle();
-    if (error) throw new InternalServerErrorException('No se pudo consultar el producto');
+    if (error) throw new InternalServerErrorException(error.message);
     if (!data) throw new NotFoundException('Producto no encontrado');
     return data;
   }
   async actualizar(id: string, datos: UpdateProductoDto) {
     await this.obtener(id);
     const { data, error } = await this.supabaseService.cliente.from('productos').update(datos).eq('id', id).select().single();
-    if (error) throw new InternalServerErrorException('No se pudo actualizar el producto');
+    if (error) throw new InternalServerErrorException(error.message);
     return data;
   }
   async eliminar(id: string) {
     await this.obtener(id);
     const { error } = await this.supabaseService.cliente.from('productos').delete().eq('id', id);
     if (error?.code === '23503') throw new NotFoundException('No se puede eliminar un producto vendido');
-    if (error) throw new InternalServerErrorException('No se pudo eliminar el producto');
+    if (error) throw new InternalServerErrorException(error.message);
     return { mensaje: 'Producto eliminado correctamente' };
   }
 }
