@@ -101,12 +101,6 @@ export class AuthController {
     return sesion;
   }
 
-  @Get('me')
-  @ApiOperation({ summary: 'Obtiene el usuario autenticado' })
-  obtenerUsuario(@CurrentUser() usuario: User) {
-    return usuario;
-  }
-
   @Post('logout')
   @ApiOperation({
     summary: 'Cierra la sesión del usuario autenticado',
