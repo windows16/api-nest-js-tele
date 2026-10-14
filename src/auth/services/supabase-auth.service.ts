@@ -69,17 +69,21 @@ export class SupabaseAuthService {
   }
 
   async cerrarSesion(tokenAcceso: string): Promise<{ mensaje: string }> {
+    // Usar 'local' para revocar solo el access token actual.
+    // 'global' invalida TODAS las sesiones del usuario (incluido el refresh token),
+    // lo que causa "Auth session missing!" si el navegador guarda cookies de la sesion anterior.
     const { error } = await this.supabaseService.cliente.auth.admin.signOut(
       tokenAcceso,
-      'global',
+      'local',
     );
 
     if (error) {
+      // Si el token ya expiro, Supabase puede devolver error; no es critico para el cliente.
       throw new InternalServerErrorException(
-        'No se pudo cerrar la sesión en Supabase',
+        'No se pudo cerrar la sesion en Supabase',
       );
     }
 
-    return { mensaje: 'Sesión cerrada correctamente' };
+    return { mensaje: 'Sesion cerrada correctamente' };
   }
 }
