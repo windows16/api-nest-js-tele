@@ -34,15 +34,41 @@ export class SupabaseAuthGuard implements CanActivate {
 
     const solicitud =
       context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const autorizacion = solicitud.headers.authorization;
-    const [esquema, token, ...partesAdicionales] =
-      autorizacion?.trim().split(/\s+/) ?? [];
 
-    if (
-      esquema?.toLowerCase() !== 'bearer' ||
-      !token ||
-      partesAdicionales.length > 0
-    ) {
+    let token: string | undefined;
+
+    // 1. Extraer desde la cabecera Authorization (Bearer <token>)
+    const autorizacion = solicitud.headers.authorization?.trim();
+    if (autorizacion) {
+      let authLimpia = autorizacion;
+      while (/^bearer\s+bearer\s+/i.test(authLimpia)) {
+        authLimpia = authLimpia.replace(/^bearer\s+/i, '');
+      }
+
+      const [esquema, tokenExtraido, ...partesAdicionales] = authLimpia.split(/\s+/);
+      if (esquema?.toLowerCase() === 'bearer' && tokenExtraido && partesAdicionales.length === 0) {
+        token = tokenExtraido;
+      }
+    }
+
+    // 2. Extraer desde cookies parseadas por cookie-parser
+    if (!token && solicitud.cookies) {
+      token =
+        solicitud.cookies['nest_access_token'] ||
+        solicitud.cookies['access_token'];
+    }
+
+    // 3. Extraer desde cabecera cookie raw (fallback)
+    if (!token && solicitud.headers.cookie) {
+      const match = solicitud.headers.cookie.match(
+        /(?:^|;\s*)(?:nest_access_token|access_token)=([^;]+)/,
+      );
+      if (match) {
+        token = decodeURIComponent(match[1]);
+      }
+    }
+
+    if (!token) {
       throw new UnauthorizedException('Token Bearer ausente o mal formado');
     }
 

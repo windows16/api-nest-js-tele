@@ -1,12 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module.js';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
+  app.use(cookieParser());
   app.setGlobalPrefix('api');
   app.enableShutdownHooks();
   app.useGlobalPipes(
@@ -17,14 +19,19 @@ async function bootstrap() {
     }),
   );
 
-  const origins = (process.env.FRONTEND_URL ?? 'http://localhost:5173')
+  const origins = (process.env.FRONTEND_URL ?? 'http://localhost:5173,http://localhost:3004')
     .split(',')
     .map((o) => o.trim());
-  app.enableCors({ origin: origins });
+
+  app.enableCors({
+    origin: origins,
+    credentials: true,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Accept', 'Authorization', 'Cookie'],
+  });
 
   const isProd = process.env.NODE_ENV === 'production';
 
-  
   const swaggerConfig = new DocumentBuilder()
     .setTitle('API de gestión y auditoría')
     .setDescription(

@@ -37,6 +37,26 @@ export class SupabaseAuthService {
     };
   }
 
+  async refrescarSesion(refreshToken: string) {
+    const { data, error } =
+      await this.supabaseService.cliente.auth.refreshSession({
+        refresh_token: refreshToken,
+      });
+
+    if (error || !data.session) {
+      throw new UnauthorizedException('Sesión expirada o refresh token inválido');
+    }
+
+    return {
+      access_token: data.session.access_token,
+      token_type: data.session.token_type,
+      expires_in: data.session.expires_in,
+      expires_at: data.session.expires_at,
+      refresh_token: data.session.refresh_token,
+      user: data.user,
+    };
+  }
+
   async obtenerUsuarioPorToken(tokenAcceso: string): Promise<User> {
     const { data: datos, error: errorSupabase } =
       await this.supabaseService.cliente.auth.getUser(tokenAcceso);
