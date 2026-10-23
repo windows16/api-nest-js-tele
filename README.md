@@ -1,190 +1,658 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# API NestJS de gestión y auditoría
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API backend desarrollada con [NestJS](https://nestjs.com/) y TypeScript.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+La API proporciona funcionalidades para:
 
-## Description
+- Autenticación de usuarios mediante Supabase.
+- Gestión de usuarios.
+- Gestión de roles y permisos.
+- Gestión de clientes.
+- Gestión de productos.
+- Gestión de ventas.
+- Consulta de registros de auditoría.
+- Documentación interactiva mediante Swagger.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Requisitos previos
 
-## Project setup
+- [Node.js](https://nodejs.org/)
+- npm
+- Una cuenta de Supabase
+- Un proyecto de Google Cloud si deseas desplegar la API en Cloud Run
+
+## Instalación
+
+Clona el repositorio:
 
 ```bash
-$ npm install
+git clone https://github.com/windows16/api-nest-js-tele.git
+cd api-nest-js-tele
 ```
 
-## Compile and run the project
+Instala las dependencias:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+## Variables de entorno
+
+Crea un archivo `.env` en la raíz del proyecto:
+
+```env
+PORT=3000
+NODE_ENV=development
+
+SUPABASE_URL=https://tu-proyecto.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key
+
+FRONTEND_URL=http://localhost:5173,http://localhost:3004
+```
+
+### Variables requeridas
+
+| Variable | Descripción |
+|---|---|
+| `PORT` | Puerto donde escuchará la API. Cloud Run proporciona este valor automáticamente. |
+| `SUPABASE_URL` | URL del proyecto de Supabase. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clave privada de servicio de Supabase. |
+| `FRONTEND_URL` | Lista de orígenes permitidos para CORS, separados por comas. |
+| `NODE_ENV` | Entorno de ejecución, por ejemplo `development` o `production`. |
+
+> Nunca subas el archivo `.env` al repositorio. La variable `SUPABASE_SERVICE_ROLE_KEY` es privada y debe configurarse como un secreto o variable protegida en el entorno de despliegue.
+
+## Ejecutar en desarrollo
+
+Inicia la API normalmente:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run start
 ```
 
-## Deployment
-
-### Despliegue en Google Cloud Run
-
-#### Requisitos previos
-
-- Instala la [Google Cloud CLI](https://cloud.google.com/sdk/docs/install).
-- Inicia sesión en Google Cloud:
+Inicia la API en modo observación:
 
 ```bash
-gcloud auth login
-gcloud auth application-default login
+npm run start:dev
 ```
 
-- Selecciona el proyecto de Google Cloud:
+Inicia la API en modo depuración:
 
 ```bash
-gcloud config set project TU_PROJECT_ID
+npm run start:debug
 ```
 
-Reemplaza `TU_PROJECT_ID` con el ID real de tu proyecto.
+Por defecto, la API estará disponible en:
 
-#### Habilitar los servicios necesarios
+```text
+http://localhost:3000
+```
 
-Ejecuta los siguientes comandos para habilitar Cloud Run y Cloud Build:
+## Compilar la aplicación
+
+Para generar la versión de producción:
 
 ```bash
-gcloud services enable run.googleapis.com cloudbuild.googleapis.com
+npm run build
 ```
 
-#### Desplegar la aplicación
+Los archivos compilados se generarán en la carpeta:
 
-Desde la raíz del proyecto, ejecuta:
+```text
+dist/
+```
+
+## Ejecutar en producción
+
+Después de compilar el proyecto, ejecuta:
 
 ```bash
-gcloud run deploy api-nest-js-tele \
-  --source . \
-  --region us-central1 \
-  --platform managed \
-  --allow-unauthenticated
+npm run start:prod
 ```
 
-Puedes reemplazar `us-central1` por otra región de Google Cloud cercana a tus usuarios.
-
-Durante el despliegue, Google Cloud construirá la aplicación y creará el servicio en Cloud Run. Al finalizar, se mostrará la URL pública de la aplicación.
-
-Para consultar la URL posteriormente, ejecuta:
+El script de producción ejecuta:
 
 ```bash
-gcloud run services describe api-nest-js-tele \
-  --region us-central1 \
-  --format="value(status.url)"
+node dist/main
 ```
 
-#### Configuración del puerto
+## Pruebas
 
-Cloud Run proporciona el puerto mediante la variable de entorno `PORT`. La aplicación NestJS debe escuchar en ese puerto y aceptar conexiones externas usando `0.0.0.0`.
+Ejecutar las pruebas unitarias:
 
-En `src/main.ts`, utiliza una configuración similar a la siguiente:
+```bash
+npm run test
+```
+
+Ejecutar las pruebas en modo observación:
+
+```bash
+npm run test:watch
+```
+
+Ejecutar las pruebas end-to-end:
+
+```bash
+npm run test:e2e
+```
+
+Generar el informe de cobertura:
+
+```bash
+npm run test:cov
+```
+
+## Linting y formato
+
+Formatear el código:
+
+```bash
+npm run format
+```
+
+Ejecutar el análisis estático:
+
+```bash
+npm run lint
+```
+
+## Documentación Swagger
+
+La documentación Swagger está disponible en:
+
+```text
+http://localhost:3000/api/docs
+```
+
+El documento OpenAPI en formato JSON está disponible en:
+
+```text
+http://localhost:3000/api/docs/openapi.json
+```
+
+En producción, reemplaza `localhost:3000` por la URL asignada por Cloud Run.
+
+## Prefijo de la API
+
+Todas las rutas de la API utilizan el prefijo global:
+
+```text
+/api
+```
+
+Por ejemplo, una ruta de autenticación puede tener una URL similar a:
+
+```text
+/api/auth/login
+```
+
+Las rutas de usuarios utilizan el prefijo definido por sus controladores. Por ejemplo:
+
+```text
+/api/v1/profile
+```
+
+## Autenticación
+
+La API utiliza Supabase para autenticar a los usuarios.
+
+Las rutas protegidas aceptan el token mediante la cabecera:
+
+```http
+Authorization: Bearer ACCESS_TOKEN
+```
+
+También se pueden utilizar las cookies de autenticación generadas por la API:
+
+```text
+nest_access_token
+nest_refresh_token
+```
+
+Para probar las rutas protegidas desde Swagger:
+
+1. Abre la documentación Swagger.
+2. Pulsa el botón **Authorize**.
+3. Introduce el token Bearer.
+4. Pulsa **Authorize**.
+5. Ejecuta las rutas protegidas.
+
+## Despliegue en Google Cloud Run mediante la interfaz web
+
+Google Cloud Run permite conectar un repositorio de GitHub mediante Cloud Build o Developer Connect para crear despliegues automáticos cada vez que se actualiza una rama. ([docs.cloud.google.com](https://docs.cloud.google.com/run/docs/continuous-deployment?utm_source=openai))
+
+### Requisitos para Cloud Run
+
+Necesitas:
+
+- Un proyecto activo de Google Cloud.
+- Facturación habilitada en el proyecto.
+- Acceso al repositorio de GitHub.
+- Permisos para utilizar Cloud Run y Cloud Build.
+- El repositorio:
+
+```text
+windows16/api-nest-js-tele
+```
+
+- La rama que deseas desplegar, por ejemplo:
+
+```text
+main
+```
+
+### Habilitar las APIs necesarias
+
+Desde Google Cloud Console, habilita las siguientes APIs:
+
+- Cloud Run Admin API
+- Cloud Build API
+- Artifact Registry API
+
+También puedes abrir la sección de APIs y servicios desde el menú principal de Google Cloud:
+
+```text
+Google Cloud Console → APIs y servicios → Biblioteca
+```
+
+Busca cada API y pulsa **Habilitar**.
+
+### Crear el servicio desde Cloud Run
+
+1. Abre [Google Cloud Console](https://console.cloud.google.com/).
+
+2. Selecciona el proyecto de Google Cloud donde deseas desplegar la API.
+
+3. En el menú principal, entra en:
+
+   ```text
+   Cloud Run → Services
+   ```
+
+4. Haz clic en:
+
+   ```text
+   Create service
+   ```
+
+5. Selecciona:
+
+   ```text
+   Continuously deploy new revisions from a source repository
+   ```
+
+6. En el proveedor de compilación, selecciona:
+
+   ```text
+   Cloud Build
+   ```
+
+7. Haz clic en:
+
+   ```text
+   Set up with Cloud Build
+   ```
+
+8. En el proveedor del repositorio, selecciona:
+
+   ```text
+   GitHub
+   ```
+
+9. Si es la primera vez que conectas GitHub con Google Cloud, pulsa:
+
+   ```text
+   Authenticate
+   ```
+
+   Autoriza la aplicación de Google Cloud Build y concede acceso al repositorio correspondiente.
+
+10. Selecciona:
+
+    ```text
+    Repository: windows16/api-nest-js-tele
+    ```
+
+11. Selecciona la rama que deseas desplegar:
+
+    ```text
+    Branch: main
+    ```
+
+    Si tu rama principal se llama `master`, selecciona `master`.
+
+12. Configura el directorio del repositorio como:
+
+    ```text
+    /
+    ```
+
+    La raíz del repositorio debe contener archivos como:
+
+    ```text
+    package.json
+    tsconfig.json
+    nest-cli.json
+    src/
+    ```
+
+13. En la configuración de compilación, selecciona:
+
+    ```text
+    Google Cloud Buildpacks
+    ```
+
+    Cloud Run puede utilizar buildpacks para construir automáticamente una imagen de contenedor desde el código fuente. ([docs.cloud.google.com](https://docs.cloud.google.com/run/docs/quickstarts/deploy-continuously?utm_source=openai))
+
+14. Define el nombre del servicio:
+
+    ```text
+    api-nest-js-tele
+    ```
+
+15. Selecciona una región cercana a tus usuarios, por ejemplo:
+
+    ```text
+    us-central1
+    ```
+
+16. En la sección de autenticación, selecciona:
+
+    ```text
+    Allow unauthenticated invocations
+    ```
+
+    Esta opción permite que el frontend y otros clientes consuman la API públicamente.
+
+17. En la configuración del contenedor, utiliza el puerto:
+
+    ```text
+    8080
+    ```
+
+    La aplicación no debe fijar exclusivamente este puerto, ya que Cloud Run proporciona el valor mediante la variable `PORT`.
+
+18. Haz clic en:
+
+    ```text
+    Create
+    ```
+
+19. Espera a que Cloud Build compile el proyecto y Cloud Run cree la primera revisión.
+
+20. Cuando finalice el despliegue, Cloud Run mostrará la URL pública de la API.
+
+### Configurar las variables de entorno en Cloud Run
+
+Después de crear el servicio:
+
+1. Abre:
+
+   ```text
+   Cloud Run → Services
+   ```
+
+2. Selecciona:
+
+   ```text
+   api-nest-js-tele
+   ```
+
+3. Pulsa:
+
+   ```text
+   Edit and deploy new revision
+   ```
+
+4. Abre:
+
+   ```text
+   Container(s), Volumes, Networking, Security
+   ```
+
+5. Entra en la pestaña:
+
+   ```text
+   Variables & Secrets
+   ```
+
+6. Agrega las siguientes variables:
+
+   ```text
+   NODE_ENV=production
+   ```
+
+   ```text
+   SUPABASE_URL=https://tu-proyecto.supabase.co
+   ```
+
+   ```text
+   SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key
+   ```
+
+   ```text
+   FRONTEND_URL=https://tu-frontend.com
+   ```
+
+7. No es necesario establecer manualmente `PORT`. Cloud Run proporciona esta variable automáticamente.
+
+8. Pulsa:
+
+   ```text
+   Deploy
+   ```
+
+> La variable `SUPABASE_SERVICE_ROLE_KEY` debe almacenarse preferiblemente en Secret Manager y asociarse al servicio de Cloud Run como un secreto, en lugar de escribirla directamente como texto plano.
+
+### Configurar el puerto
+
+La aplicación ya está preparada para Cloud Run porque utiliza el puerto proporcionado por la variable `PORT` y escucha en `0.0.0.0`:
 
 ```typescript
-await app.listen(process.env.PORT || 3000, '0.0.0.0');
+const port = Number(process.env.PORT ?? 3000);
+await app.listen(port, '0.0.0.0');
 ```
 
-#### Despliegue privado
+Cloud Run requiere que el contenedor escuche en el puerto indicado por `PORT`. ([docs.cloud.google.com](https://docs.cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-nodejs-service?hl=en&utm_source=openai))
 
-El comando anterior permite el acceso público mediante la opción `--allow-unauthenticated`.
+### Consultar la URL de la API
 
-Para crear un servicio privado, elimina dicha opción:
+Cuando termine el despliegue:
 
-```bash
-gcloud run deploy api-nest-js-tele \
-  --source . \
-  --region us-central1 \
-  --platform managed
+1. Entra en:
+
+   ```text
+   Cloud Run → Services
+   ```
+
+2. Selecciona el servicio:
+
+   ```text
+   api-nest-js-tele
+   ```
+
+3. Copia la URL que aparece en la parte superior.
+
+Por ejemplo:
+
+```text
+https://api-nest-js-tele-xxxxxxxxxx-uc.a.run.app
 ```
 
-En ese caso, las solicitudes deberán autenticarse mediante Google Cloud IAM.
+### Comprobar Swagger en Cloud Run
 
-## Observability
+La documentación Swagger estará disponible en:
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project:
-
-```bash
-$ npm install @nestjs/observe
+```text
+https://TU_URL_DE_CLOUD_RUN/api/docs
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/overview) - it takes a single import and an app key.
+El documento OpenAPI estará disponible en:
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+```text
+https://TU_URL_DE_CLOUD_RUN/api/docs/openapi.json
+```
 
-## Resources
+Ejemplo:
 
-Check out a few resources that may come in handy when working with NestJS:
+```text
+https://api-nest-js-tele-xxxxxxxxxx-uc.a.run.app/api/docs
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Configurar el frontend
 
-## Support
+Después de obtener la URL pública de Cloud Run, configura el frontend usando esa URL como dirección de la API.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Por ejemplo:
 
-## Stay in touch
+```env
+API_URL=https://TU_URL_DE_CLOUD_RUN/api
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+También debes actualizar la variable `FRONTEND_URL` en Cloud Run para que contenga la URL real del frontend:
 
-## License
+```text
+FRONTEND_URL=https://tu-frontend.com
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Si tienes varios frontends, sepáralos por comas:
+
+```text
+FRONTEND_URL=https://tu-frontend.com,https://www.tu-frontend.com
+```
+
+### Despliegues automáticos
+
+Cuando se configura la opción de despliegue continuo desde GitHub, Cloud Run puede crear una nueva revisión cada vez que se envía un commit a la rama configurada. ([docs.cloud.google.com](https://docs.cloud.google.com/run/docs/continuous-deployment?utm_source=openai))
+
+El flujo será:
+
+```text
+Commit en GitHub
+        ↓
+Cloud Build
+        ↓
+Instalación de dependencias
+        ↓
+Compilación de NestJS
+        ↓
+Nueva revisión de Cloud Run
+        ↓
+API actualizada
+```
+
+### Revisar los logs
+
+Para revisar los logs de la API:
+
+1. Entra en:
+
+   ```text
+   Cloud Run → Services
+   ```
+
+2. Selecciona:
+
+   ```text
+   api-nest-js-tele
+   ```
+
+3. Abre la pestaña:
+
+   ```text
+   Logs
+   ```
+
+También puedes revisar los logs del proceso de compilación desde:
+
+```text
+Cloud Build → History
+```
+
+## Solución de problemas
+
+### El contenedor no inicia
+
+Revisa que:
+
+- `package.json` tenga el script `start:prod`.
+- La aplicación escuche en `0.0.0.0`.
+- La aplicación utilice `process.env.PORT`.
+- Las variables `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` estén configuradas.
+- El directorio seleccionado en Cloud Build sea `/`.
+
+### Error relacionado con Supabase
+
+Verifica que las siguientes variables existan en Cloud Run:
+
+```text
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+```
+
+La aplicación no puede iniciar correctamente sin estas variables.
+
+### Error de CORS
+
+Verifica que `FRONTEND_URL` contenga exactamente la URL del frontend, sin una barra final innecesaria:
+
+```text
+https://tu-frontend.com
+```
+
+Si utilizas varios orígenes:
+
+```text
+https://tu-frontend.com,https://www.tu-frontend.com
+```
+
+### Swagger devuelve error 404
+
+Comprueba que estés utilizando la ruta completa:
+
+```text
+/api/docs
+```
+
+No utilices únicamente:
+
+```text
+/docs
+```
+
+### La API solicita autenticación
+
+Las rutas protegidas necesitan un token de Supabase en la cabecera:
+
+```http
+Authorization: Bearer ACCESS_TOKEN
+```
+
+Las rutas públicas, como el inicio de sesión, no requieren un token.
+
+## Scripts disponibles
+
+| Comando | Descripción |
+|---|---|
+| `npm run start` | Inicia la API en modo normal |
+| `npm run start:dev` | Inicia la API en modo desarrollo |
+| `npm run start:debug` | Inicia la API en modo depuración |
+| `npm run build` | Compila la API |
+| `npm run start:prod` | Ejecuta la versión compilada |
+| `npm run lint` | Ejecuta el análisis estático |
+| `npm run format` | Formatea el código |
+| `npm run test` | Ejecuta las pruebas unitarias |
+| `npm run test:e2e` | Ejecuta las pruebas end-to-end |
+| `npm run test:cov` | Genera la cobertura de pruebas |
+
+## Recursos
+
+- [Documentación de NestJS](https://docs.nestjs.com/)
+- [Documentación de Swagger en NestJS](https://docs.nestjs.com/openapi/introduction)
+- [Documentación de Supabase](https://supabase.com/docs)
+- [Documentación de Google Cloud Run](https://cloud.google.com/run/docs)
+- [Despliegue continuo desde un repositorio](https://cloud.google.com/run/docs/continuous-deployment)
+- [Despliegue de código fuente en Cloud Run](https://cloud.google.com/run/docs/deploying-source-code)
+
+## Licencia
+
+Este proyecto es privado y no tiene una licencia pública definida.
