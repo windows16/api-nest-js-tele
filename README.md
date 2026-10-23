@@ -59,16 +59,82 @@ $ npm run test:cov
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Despliegue en Google Cloud Run
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+#### Requisitos previos
+
+- Instala la [Google Cloud CLI](https://cloud.google.com/sdk/docs/install).
+- Inicia sesión en Google Cloud:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+gcloud auth login
+gcloud auth application-default login
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- Selecciona el proyecto de Google Cloud:
+
+```bash
+gcloud config set project TU_PROJECT_ID
+```
+
+Reemplaza `TU_PROJECT_ID` con el ID real de tu proyecto.
+
+#### Habilitar los servicios necesarios
+
+Ejecuta los siguientes comandos para habilitar Cloud Run y Cloud Build:
+
+```bash
+gcloud services enable run.googleapis.com cloudbuild.googleapis.com
+```
+
+#### Desplegar la aplicación
+
+Desde la raíz del proyecto, ejecuta:
+
+```bash
+gcloud run deploy api-nest-js-tele \
+  --source . \
+  --region us-central1 \
+  --platform managed \
+  --allow-unauthenticated
+```
+
+Puedes reemplazar `us-central1` por otra región de Google Cloud cercana a tus usuarios.
+
+Durante el despliegue, Google Cloud construirá la aplicación y creará el servicio en Cloud Run. Al finalizar, se mostrará la URL pública de la aplicación.
+
+Para consultar la URL posteriormente, ejecuta:
+
+```bash
+gcloud run services describe api-nest-js-tele \
+  --region us-central1 \
+  --format="value(status.url)"
+```
+
+#### Configuración del puerto
+
+Cloud Run proporciona el puerto mediante la variable de entorno `PORT`. La aplicación NestJS debe escuchar en ese puerto y aceptar conexiones externas usando `0.0.0.0`.
+
+En `src/main.ts`, utiliza una configuración similar a la siguiente:
+
+```typescript
+await app.listen(process.env.PORT || 3000, '0.0.0.0');
+```
+
+#### Despliegue privado
+
+El comando anterior permite el acceso público mediante la opción `--allow-unauthenticated`.
+
+Para crear un servicio privado, elimina dicha opción:
+
+```bash
+gcloud run deploy api-nest-js-tele \
+  --source . \
+  --region us-central1 \
+  --platform managed
+```
+
+En ese caso, las solicitudes deberán autenticarse mediante Google Cloud IAM.
 
 ## Observability
 
